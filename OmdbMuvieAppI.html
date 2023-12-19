@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <style>
+      #container {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        justify-content: space-between;
+        /* border: 1px solid black; */
+        padding: 20px;
+        margin: 20px;
+      }
+      .card{
+        border:1px solid black;
+        padding:10px;
+        gap:10px;
+        justify-content: center;
+        text-align: center;
+        margin:10px;
+      }
+    </style>
+    <title>OMDB API</title>
+  </head>
+  <body>
+    <h1>OMDB MOVIES</h1>
+    <input type="text" id="searchParam" />
+    <button onclick="getData()">Search</button>
+    <div id="container"></div>
+    <script>
+        let API_KEY = "3fadf3f6"
+let container = document.getElementById("container")
+
+function getData() {
+  let searchParam = document.getElementById("searchParam").value
+
+  // get the data
+  fetch(`http://www.omdbapi.com/?apikey=${API_KEY}&s=${searchParam}`)
+    .then(function (res) {
+      return res.json()
+    })
+    .then(function (res) {
+      displayData(res.Search)
+    })
+    .catch(function (err) {
+      console.log(err)
+    })
+}
+
+function displayData(moviesList) {
+  container.innerHTML = ""
+
+  if (!moviesList || moviesList.length === 0) {
+    let notFoundDiv = document.createElement("div")
+    notFoundDiv.textContent = "No Results Found"
+    container.appendChild(notFoundDiv)
+  } else {
+    moviesList.map((movie) => {
+      let movieCard = document.createElement("div")
+      movieCard.className = "card"
+
+      // Create Image
+      let posterElement = document.createElement("img")
+      posterElement.src = movie.Poster
+
+      // Create Title
+      let titleElement = document.createElement("p")
+      titleElement.textContent = "Title : " + movie.Title
+
+      // Create Year
+      let yearElement = document.createElement("p")
+      yearElement.textContent = "Year : " + movie.Year
+
+      // Create IMDB ID;
+      let idElement = document.createElement("p")
+      idElement.textContent = "IMDB-ID : " + movie.imdbID
+
+      // Create Type
+      let typeElement = document.createElement("p")
+      typeElement.textContent = "Type : " + movie.Type
+
+      movieCard.append(
+        posterElement,
+        titleElement,
+        yearElement,
+        idElement,
+        typeElement
+      )
+
+      movieCard.addEventListener("click", function (e) {
+        localStorage.setItem("imdbID", movie.imdbID)
+        location.href = "moviedetails.html"
+      })
+
+      container.append(movieCard)
+    })
+  }
+}
+    </script>
+  </body>
+</html>
